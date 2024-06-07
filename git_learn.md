@@ -807,3 +807,59 @@ $ git branch -d feature1
 Deleted branch feature1 (was c4df771).
 ```
 
+##### 分支管理策略
+
+通常，合并分支时，如果可能，Git会用`Fast forward`模式，但这种模式下，删除分支后，会丢掉分支信息。
+
+如果要强制禁用`Fast forward`模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。
+
+首先，仍然创建并切换`dev`分支：
+
+```tex
+$ git switch -c dev
+Switched to a new branch 'dev'
+```
+
+修改readme.txt文件，并提交一个新的commit：
+
+```tex
+$ git add readme.txt 
+$ git commit -m "add merge"
+[dev 566ffd3] add merge
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+现在，我们切换回`main`：
+
+```tex
+$ git switch main
+Switched to branch 'main'
+Your branch is up to date with 'origin/main'.
+```
+
+准备合并`dev`分支，请注意`--no-ff`参数，表示禁用`Fast forward`：
+
+```tex
+$ git merge --no-ff -m "merge with no-ff" dev
+Merge made by the 'ort' strategy.
+ readme.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+因为本次合并要创建一个新的commit，所以加上`-m`参数，把commit描述写进去。
+
+合并后，我们用`git log`看看分支历史：
+
+```tex
+$ git log --graph --pretty=oneline --abbrev-commit
+*   af8cbe8 (HEAD -> main) merge with no-ff
+|\
+| * 566ffd3 (dev) add merge
+|/
+* e5ceaf0 (origin/main) commit files
+* 0ede61a first commit
+```
+
+可以看到，不使用`Fast forward`模式，merge后就像这样：
+
+![image-20240607110827195](git_learn.assets/image-20240607110827195.png)
